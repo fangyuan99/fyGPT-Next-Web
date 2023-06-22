@@ -118,12 +118,23 @@ export function SideBar(props: { className?: string }) {
         shouldNarrow && styles["narrow-sidebar"]
       }`}
     >
-      <div className={styles["sidebar-header"]} data-tauri-drag-region>
-        <div className={styles["sidebar-title"]} data-tauri-drag-region>
-          ChatGPT Next
-        </div>
+      <div className={styles["sidebar-header"]}>
+        <div className={styles["sidebar-title"]}>FyGPT</div>
         <div className={styles["sidebar-sub-title"]}>
-          Build your own AI assistant.
+          FyGPT 无需翻墙
+          <br />
+          仅需一杯奶茶钱就可以享受FyGPT:{" "}
+          <a href="https://fk.fy99.ml">购买链接</a>
+          <br />
+          联系<a href="https://api.ooomn.com/api/qqtalk?qq=1160196247">
+            QQ
+          </a>{" "}
+          或者
+          <a href="https://qm.qq.com/cgi-bin/qm/qr?k=BKRmQPRu33Lt8jZBLr7p8eVwmMPZu1hW&jump_from=webapi&authKey=jOTr+hP2Nj6p1g+hsDKHwtQgs/nQavotKatyHkw1NMd/ygv9/4om5MiefAHUwBkK">
+            加入QQ群
+          </a>
+          <br />
+          群内有各种GPT机器人免费体验（支持AI作画）
         </div>
         <div className={styles["sidebar-logo"] + " no-dark"}>
           <ChatGptIcon />
@@ -175,11 +186,11 @@ export function SideBar(props: { className?: string }) {
               <IconButton icon={<SettingsIcon />} shadow />
             </Link>
           </div>
-          <div className={styles["sidebar-action"]}>
+          {/* <div className={styles["sidebar-action"]}>
             <a href={REPO_URL} target="_blank">
               <IconButton icon={<GithubIcon />} shadow />
             </a>
-          </div>
+          </div> */}
         </div>
         <div>
           <IconButton

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, HTMLProps, useRef } from "react";
 
 import styles from "./settings.module.scss";
 
@@ -10,15 +10,7 @@ import ClearIcon from "../icons/clear.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import EditIcon from "../icons/edit.svg";
 import EyeIcon from "../icons/eye.svg";
-import {
-  Input,
-  List,
-  ListItem,
-  Modal,
-  PasswordInput,
-  Popover,
-  Select,
-} from "./ui-lib";
+import { Input, List, ListItem, Modal, PasswordInput, Popover } from "./ui-lib";
 import { ModelConfigList } from "./model-config";
 
 import { IconButton } from "./button";
@@ -31,12 +23,7 @@ import {
   useAppConfig,
 } from "../store";
 
-import Locale, {
-  AllLangs,
-  ALL_LANG_OPTIONS,
-  changeLang,
-  getLang,
-} from "../locales";
+import Locale, { AllLangs, changeLang, getLang } from "../locales";
 import { copyToClipboard } from "../utils";
 import Link from "next/link";
 import { Path, UPDATE_URL } from "../constant";
@@ -45,7 +32,6 @@ import { ErrorBoundary } from "./error";
 import { InputRange } from "./input-range";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarPicker } from "./emoji";
-import { getClientConfig } from "../config/client";
 
 function EditPromptModal(props: { id: number; onClose: () => void }) {
   const promptStore = usePromptStore();
@@ -286,12 +272,9 @@ export function Settings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const clientConfig = useMemo(() => getClientConfig(), []);
-  const showAccessCode = enabledAccessControl && !clientConfig?.isApp;
-
   return (
     <ErrorBoundary>
-      <div className="window-header" data-tauri-drag-region>
+      <div className="window-header">
         <div className="window-header-title">
           <div className="window-header-main-title">
             {Locale.Settings.Title}
@@ -359,7 +342,46 @@ export function Settings() {
             </Popover>
           </ListItem>
 
-          <ListItem
+          {!accessStore.hideUserApiKey ? (
+            <ListItem
+              title={Locale.Settings.Token.Title}
+              subTitle={Locale.Settings.Token.SubTitle}
+            >
+              <PasswordInput
+                value={accessStore.token}
+                type="text"
+                placeholder={Locale.Settings.Token.Placeholder}
+                onChange={(e) => {
+                  accessStore.updateToken(e.currentTarget.value);
+                }}
+              />
+            </ListItem>
+          ) : null}
+                     <ListItem
+            title={Locale.Settings.Usage.Title}
+            subTitle={
+              showUsage
+                ? loadingUsage
+                  ? Locale.Settings.Usage.IsChecking
+                  : Locale.Settings.Usage.SubTitle(
+                      usage?.used ?? "[?]",
+                      usage?.subscription ?? "[?]",
+                    )
+                : Locale.Settings.Usage.NoAccess
+            }
+          >
+            {!showUsage || loadingUsage ? (
+              <div />
+            ) : (
+              <IconButton
+                icon={<ResetIcon></ResetIcon>}
+                text={Locale.Settings.Usage.Check}
+                onClick={() => checkUsage(true)}
+              />
+            )}
+          </ListItem> 
+
+          {/* <ListItem
             title={Locale.Settings.Update.Version(currentVersion ?? "unknown")}
             subTitle={
               checkingUpdate
@@ -382,10 +404,10 @@ export function Settings() {
                 onClick={() => checkUpdate(true)}
               />
             )}
-          </ListItem>
+          </ListItem> */}
 
           <ListItem title={Locale.Settings.SendKey}>
-            <Select
+            <select
               value={config.submitKey}
               onChange={(e) => {
                 updateConfig(
@@ -399,11 +421,11 @@ export function Settings() {
                   {v}
                 </option>
               ))}
-            </Select>
+            </select>
           </ListItem>
 
           <ListItem title={Locale.Settings.Theme}>
-            <Select
+            <select
               value={config.theme}
               onChange={(e) => {
                 updateConfig(
@@ -416,11 +438,11 @@ export function Settings() {
                   {v}
                 </option>
               ))}
-            </Select>
+            </select>
           </ListItem>
 
-          <ListItem title={Locale.Settings.Lang.Name}>
-            <Select
+          {/* <ListItem title={Locale.Settings.Lang.Name}>
+            <select
               value={getLang()}
               onChange={(e) => {
                 changeLang(e.target.value as any);
@@ -428,11 +450,11 @@ export function Settings() {
             >
               {AllLangs.map((lang) => (
                 <option value={lang} key={lang}>
-                  {ALL_LANG_OPTIONS[lang]}
+                  {Locale.Settings.Lang.Options[lang]}
                 </option>
               ))}
-            </Select>
-          </ListItem>
+            </select>
+          </ListItem> */}
 
           <ListItem
             title={Locale.Settings.FontSize.Title}
@@ -487,8 +509,8 @@ export function Settings() {
           </ListItem>
         </List>
 
-        <List>
-          {showAccessCode ? (
+        {/* <List>
+           {enabledAccessControl ? (
             <ListItem
               title={Locale.Settings.AccessCode.Title}
               subTitle={Locale.Settings.AccessCode.SubTitle}
@@ -504,25 +526,10 @@ export function Settings() {
             </ListItem>
           ) : (
             <></>
-          )}
+          )} 
 
-          {!accessStore.hideUserApiKey ? (
-            <ListItem
-              title={Locale.Settings.Token.Title}
-              subTitle={Locale.Settings.Token.SubTitle}
-            >
-              <PasswordInput
-                value={accessStore.token}
-                type="text"
-                placeholder={Locale.Settings.Token.Placeholder}
-                onChange={(e) => {
-                  accessStore.updateToken(e.currentTarget.value);
-                }}
-              />
-            </ListItem>
-          ) : null}
 
-          <ListItem
+           <ListItem
             title={Locale.Settings.Usage.Title}
             subTitle={
               showUsage
@@ -544,23 +551,8 @@ export function Settings() {
                 onClick={() => checkUsage(true)}
               />
             )}
-          </ListItem>
-
-          {!accessStore.hideUserApiKey ? (
-            <ListItem
-              title={Locale.Settings.Endpoint.Title}
-              subTitle={Locale.Settings.Endpoint.SubTitle}
-            >
-              <input
-                type="text"
-                value={accessStore.openaiUrl}
-                onChange={(e) =>
-                  accessStore.updateOpenAiUrl(e.currentTarget.value)
-                }
-              ></input>
-            </ListItem>
-          ) : null}
-        </List>
+          </ListItem> 
+        </List> */}
 
         <List>
           <ListItem
@@ -597,9 +589,9 @@ export function Settings() {
         <List>
           <ModelConfigList
             modelConfig={config.modelConfig}
-            updateConfig={(updater) => {
+            updateConfig={(upater) => {
               const modelConfig = { ...config.modelConfig };
-              updater(modelConfig);
+              upater(modelConfig);
               config.update((config) => (config.modelConfig = modelConfig));
             }}
           />
