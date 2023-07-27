@@ -124,7 +124,7 @@ export function SideBar(props: { className?: string }) {
           FyGPT 无需翻墙
           <br />
           仅需一杯奶茶钱就可以享受FyGPT:{" "}
-          <a href="https://fk.fy99.ml">购买链接</a>
+          <a href="https://fk.fy99.eu.org">购买链接</a>
           <br />
           联系<a href="https://api.ooomn.com/api/qqtalk?qq=1160196247">
             QQ
